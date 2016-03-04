@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<data>
+    <xpath expr="/form/notebook/page[@id='accounting']" position="after">
+        <page string="NODUX WS" id="sri">
+            <separator string="Usuario y password de autenticacion" id='auth'/>
+            <newline/>
+            <label name="user"/>
+            <field name="user" widget="password"/>
+            <label name="password"/>
+            <field name="password" widget="password"/>
+            <label name="correo"/>
+            <field name="correo"/>
+        </page>
+    </xpath>
+    
+    <xpath
+        expr="/form/field[@name='code']"
+        position="after">
+        <newline/> 
+        <label name="date_active"/>
+        <field name="date_active"/>
+        
+    </xpath>
+    
+</data>

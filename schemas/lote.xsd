@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+    
+    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="lote">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="claveAcceso">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:minLength value="49"/>
+                            <xs:maxLength value="49"/>
+                            <xs:pattern value="[0-9]+"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="ruc">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="[0-9]{10}001"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element ref="comprobantes"/>
+            </xs:sequence>
+            <xs:attribute name="version" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="comprobantes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="comprobante" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="comprobante">
+        <xs:complexType>
+        
+            <xs:simpleContent>
+           
+                <xs:extension base="xs:string">
+                    <xs:attribute name="tipo"/>
+                    <xs:attribute name="version"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
