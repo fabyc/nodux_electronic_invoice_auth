@@ -7,7 +7,6 @@ import string
 import base64
 import xmlrpclib
 from SimpleXMLRPCServer import SimpleXMLRPCServer
-#from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 from trytond.rpc import RPC
 import hashlib
 import datetime
