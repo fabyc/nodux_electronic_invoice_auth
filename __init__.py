@@ -4,12 +4,14 @@ from trytond.pool import Pool
 from .conexiones import *
 from .account import *
 from .party import *
+from .configuration import *
 
 def register():
     Pool.register(
         DocumentXML,
         OpenTotalVoucher,
         Party,
+        Configuration,
         module='nodux_electronic_invoice_auth', type_='model')      
     Pool.register(
         OpenTotal,

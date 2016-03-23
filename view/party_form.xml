@@ -13,6 +13,21 @@
         </page>
     </xpath>
     
+    <xpath expr="/form/notebook/page[@id='accounting']" position="after">
+        <page string="Precios Comprobantes" id="precios">
+            <separator string="Precios para los comprobantes emitidos por el cliente" id='p_c'/>
+            <newline/>
+            <label name="value_1"/>
+            <field name="value_1"/>
+            <label name="value_2"/>
+            <field name="value_2"/>
+            <label name="value_3"/>
+            <field name="value_3"/>
+            <label name="value_4"/>
+            <field name="value_4"/>
+        </page>
+    </xpath>
+    
     <xpath
         expr="/form/field[@name='code']"
         position="after">

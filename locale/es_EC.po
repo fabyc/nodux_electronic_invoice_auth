@@ -1,0 +1,276 @@
+#
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "error:nodux_electronic_invoice_auth.conexiones:"
+msgid "Verifique su usuario y password, para acceder al sistema"
+msgstr "Verifique su usuario y contraseña, para acceder al sistema"
+
+msgctxt "field:account.configuration,value_1:"
+msgid "Valor de 0 a 1000 comprobantes"
+msgstr ""
+
+msgctxt "field:account.configuration,value_2:"
+msgid "Valor de 1001 a 10000 comprobantes"
+msgstr ""
+
+msgctxt "field:account.configuration,value_3:"
+msgid "Valor de 10001 a 50000 comprobantes"
+msgstr ""
+
+msgctxt "field:account.configuration,value_4:"
+msgid "Mas de 50001 comprobantes"
+msgstr ""
+
+msgctxt "field:nodux_electronic_invoice_auth.conexiones,create_date:"
+msgid "Create Date"
+msgstr "Fecha de Creación"
+
+msgctxt "field:nodux_electronic_invoice_auth.conexiones,create_uid:"
+msgid "Create User"
+msgstr "Usuario creación"
+
+msgctxt "field:nodux_electronic_invoice_auth.conexiones,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt ""
+"field:nodux_electronic_invoice_auth.conexiones,number_in_withholding:"
+msgid "Total de Comprobantes de Retención"
+msgstr ""
+
+msgctxt ""
+"field:nodux_electronic_invoice_auth.conexiones,number_out_credit_note:"
+msgid "Total de Notas de Crédito"
+msgstr ""
+
+msgctxt ""
+"field:nodux_electronic_invoice_auth.conexiones,number_out_debit_note:"
+msgid "Total de Notas de Débito"
+msgstr ""
+
+msgctxt "field:nodux_electronic_invoice_auth.conexiones,number_out_invoice:"
+msgid "Total de Facturas"
+msgstr ""
+
+msgctxt "field:nodux_electronic_invoice_auth.conexiones,number_out_shipment:"
+msgid "Total de Guías de Remisión"
+msgstr ""
+
+msgctxt "field:nodux_electronic_invoice_auth.conexiones,rec_name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:nodux_electronic_invoice_auth.conexiones,write_date:"
+msgid "Write Date"
+msgstr "Fecha de Modificación"
+
+msgctxt "field:nodux_electronic_invoice_auth.conexiones,write_uid:"
+msgid "Write User"
+msgstr "Modificado por Usuario"
+
+msgctxt ""
+"field:nodux_electronic_invoice_auth.print_total_voucher.start,end_period:"
+msgid "End Period"
+msgstr "Período final"
+
+msgctxt ""
+"field:nodux_electronic_invoice_auth.print_total_voucher.start,fiscalyear:"
+msgid "Fiscal Year"
+msgstr "Año Fiscal"
+
+msgctxt "field:nodux_electronic_invoice_auth.print_total_voucher.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:nodux_electronic_invoice_auth.print_total_voucher.start,party:"
+msgid "Party"
+msgstr "Terceros"
+
+msgctxt ""
+"field:nodux_electronic_invoice_auth.print_total_voucher.start,start_period:"
+msgid "Start Period"
+msgstr "Período inicial"
+
+msgctxt "field:party.party,correo:"
+msgid "Utilizar correo de la empresa?"
+msgstr ""
+
+msgctxt "field:party.party,date_active:"
+msgid "Fecha limite activo"
+msgstr ""
+
+msgctxt "field:party.party,password:"
+msgid "Password WS"
+msgstr "Contraseña WS"
+
+msgctxt "field:party.party,passwordws:"
+msgid "Password WS"
+msgstr "Contraseña WS"
+
+msgctxt "field:party.party,user:"
+msgid "Usuario WS"
+msgstr ""
+
+msgctxt "field:party.party,userws:"
+msgid "Usuario WS"
+msgstr ""
+
+msgctxt "field:party.party,value_1:"
+msgid "Valor de 0 a 1000 comprobantes"
+msgstr ""
+
+msgctxt "field:party.party,value_2:"
+msgid "Valor de 1001 a 10000 comprobantes"
+msgstr ""
+
+msgctxt "field:party.party,value_3:"
+msgid "Valor de 10001 a 50000 comprobantes"
+msgstr ""
+
+msgctxt "field:party.party,value_4:"
+msgid "Mas de 50001 comprobantes"
+msgstr ""
+
+msgctxt "help:party.party,correo:"
+msgid ""
+"Se utilizara el correo de la empresa emisora \n"
+" para enviar comprobantes electronicos a los clientes"
+msgstr "Se utilizará el correo de la empresa emisora"
+
+msgctxt "help:party.party,passwordws:"
+msgid "Ingrese el password que le fue emitido por la empresa"
+msgstr ""
+
+msgctxt "help:party.party,userws:"
+msgid "Ingrese el usuario que le fue emitido por la empresa"
+msgstr ""
+
+msgctxt "model:ir.action,name:report_total_voucher"
+msgid "Print Total Voucher"
+msgstr "Imprimir total de comprobantes"
+
+msgctxt "model:ir.action,name:wizard_print_total_voucher"
+msgid "Print Total Voucher Issues"
+msgstr "Imprimir total de comprobantes emitidos"
+
+msgctxt "model:ir.ui.menu,name:menu_print_total_voucher"
+msgid "Print Total Voucher Issues"
+msgstr "Comprobantes emitidos"
+
+msgctxt "model:nodux_electronic_invoice_auth.conexiones,name:"
+msgid "DocumentXML"
+msgstr ""
+
+msgctxt "model:nodux_electronic_invoice_auth.print_total_voucher.start,name:"
+msgid "Open Total Voucher"
+msgstr "Abrir total de comprobantes"
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid ".:"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid ":"
+msgstr ":"
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "A"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "C.I/RUC"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "CLIENTE"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "COMPROBANTES"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "COMPROBANTES DE RETENCIÓN"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "DATOS CLIENTE"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "EMITIDOS"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "FACTURAS"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "FECH"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "GUÍAS DE REMISIÓN"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "NOTAS DE CRÉDITO"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "NOTAS DE DÉBITO"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "PERÍODO FINAL:"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "PERÍODO INICIAL:"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "TIPO COMPROBANTE"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "TOTAL"
+msgstr ""
+
+msgctxt "odt:nodux_electronic_invoice_auth.total_voucher:"
+msgid "VALOR TOTAL"
+msgstr ""
+
+msgctxt "view:account.configuration:"
+msgid "Precios para los comprobantes emitidos por el cliente"
+msgstr ""
+
+msgctxt "view:nodux_electronic_invoice_auth.print_total_voucher.start:"
+msgid "Open Total Voucher Issues"
+msgstr "Total de comprobantes emitidos"
+
+msgctxt "view:party.party:"
+msgid "NODUX WS"
+msgstr ""
+
+msgctxt "view:party.party:"
+msgid "Precios Comprobantes"
+msgstr ""
+
+msgctxt "view:party.party:"
+msgid "Precios para los comprobantes emitidos por el cliente"
+msgstr ""
+
+msgctxt "view:party.party:"
+msgid "Usuario y password de autenticacion"
+msgstr "Usuario y contraseña de autenticación"
+
+msgctxt "wizard_button:nodux_electronic_invoice_auth.print_total,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt ""
+"wizard_button:nodux_electronic_invoice_auth.print_total,start,print_:"
+msgid "Print"
+msgstr "Imprimir"

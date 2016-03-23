@@ -79,52 +79,6 @@ class DocumentXML(ModelSQL, ModelView):
                 'no_autorizado': ('Verifique su usuario y password, para acceder al sistema'),
                 })
         
-    @staticmethod
-    def default_number_out_invoice():
-        return 0
-    @staticmethod
-    def default_number_out_credit_note():
-        return 0
-    @staticmethod
-    def default_number_in_withholding():
-        return 0
-    @staticmethod
-    def default_number_out_debit_note():
-        return 0
-    @staticmethod
-    def default_number_out_shipment():
-        return 0
-        
-    @classmethod
-    def count_voucher(cls, type_document):
-        type_voucher = type_document
-        count1 = str(cls.number_out_invoice)
-        print "Numero obtenido", count1
-        count_invoice = int(count1) + 1
-        count2 = str(cls.number_out_credit_note)
-        count_credit = int(count2) + 1
-        count3= str(cls.number_in_withholding)
-        count_retention = int(count3) + 1
-        count4= str(cls.number_out_debit_note)
-        count_debit = int(count4) + 1
-        count5 = str(cls.number_out_shipment) 
-        count_shipment = int(count5) + 1
-        
-        if type_voucher == 'out_invoice':
-            cls.write(cls.id, {'number_out_invoice': count_invoice})
-            
-        if type_voucher == 'out_credit_note':
-            cls.write(cls.id, {'number_out_credit_note': count_credit})
-        
-        if type_voucher == 'in_withholding':
-            cls.write(cls.id, {'number_in_invoice': count_retention})
-            
-        if type_voucher == 'out_debit_note':
-            cls.write(cls.id, {'number_out_debit_note': count_debit})
-            
-        if type_voucher == 'out_shipment':
-            cls.write(cls.id, {'number_out_shipment': count_shipment})
-    
     @classmethod
     def authenticate(cls, user, password):
         pool = Pool()
@@ -162,7 +116,6 @@ class DocumentXML(ModelSQL, ModelView):
                     
             return flag, flag_c, flag_a
     @classmethod
-    
     def check_password(cls, password, hash_):
         if not hash_:
             return False
