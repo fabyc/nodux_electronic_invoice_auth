@@ -8,10 +8,12 @@ from .configuration import *
 
 def register():
     Pool.register(
+        Party,
+        Address,
+        Company,
+        Configuration,
         DocumentXML,
         OpenTotalVoucher,
-        Party,
-        Configuration,
         module='nodux_electronic_invoice_auth', type_='model')      
     Pool.register(
         OpenTotal,

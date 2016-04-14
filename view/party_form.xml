@@ -13,6 +13,22 @@
         </page>
     </xpath>
     
+    <xpath
+        expr="/form/notebook/page[@id='accounting']/label[@name='vat_number']"
+        position="before">
+        <label name="type_document"/>
+        <field name="type_document"/>
+        <newline/> 
+    </xpath>
+    <xpath
+        expr="/form/notebook/page[@id='accounting']/field[@name='vat_country']"
+        position="replace">
+    </xpath>
+    <xpath
+        expr="/form/notebook/page[@id='accounting']/label[@name='vat_country']"
+        position="replace">
+    </xpath>
+    
     <xpath expr="/form/notebook/page[@id='accounting']" position="after">
         <page string="Precios Comprobantes" id="precios">
             <separator string="Precios para los comprobantes emitidos por el cliente" id='p_c'/>
