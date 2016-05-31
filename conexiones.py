@@ -535,11 +535,11 @@ class SriService(object):
 
     __WS_TESTING = (__WS_TEST_RECEIV, __WS_TEST_AUTH)
     __WS_PROD = (__WS_RECEIV, __WS_AUTH)
-    __WS_ACTIVE = __WS_TESTING
+    __WS_ACTIVE = __WS_PROD
 
     @classmethod
     def get_active_env(self):
-        return self.get_env_test()
+        return self.get_env_prod()
 
     @classmethod
     def get_env_test(self):
