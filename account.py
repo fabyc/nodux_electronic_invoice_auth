@@ -90,12 +90,6 @@ class TotalVoucher(Report):
     @classmethod
     def parse(cls, report, objects, data, localcontext):
         pool = Pool()
-        
-        value_1 = 0.08 
-        value_2 =0.06
-        value_3 =0.04
-        value_4 =0.03
-        Invoice = pool.get('account.invoice')
         Period = pool.get('account.period')
         Fiscal = pool.get('account.fiscalyear')
         Party = pool.get('party.party')
@@ -105,7 +99,6 @@ class TotalVoucher(Report):
         end = Period(data['end_period'])
         fiscal_start = fiscal.start_date
         fiscal_end = fiscal.end_date
-        print "Principio y fin ", start.id, end.id
         if start.id != None:
             start_p_start = start.start_date
             end_p_start = (start.end_date)

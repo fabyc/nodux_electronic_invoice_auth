@@ -5,21 +5,20 @@ from .conexiones import *
 from .account import *
 from .party import *
 from .configuration import *
+from .company import *
 
 def register():
     Pool.register(
         Party,
         Address,
-        Company,
         Configuration,
+        Company,
         DocumentXML,
         OpenTotalVoucher,
-        module='nodux_electronic_invoice_auth', type_='model')      
+        module='nodux_electronic_invoice_auth', type_='model')
     Pool.register(
         OpenTotal,
-        module='nodux_electronic_invoice_auth', type_='wizard')        
+        module='nodux_electronic_invoice_auth', type_='wizard')
     Pool.register(
         TotalVoucher,
         module='nodux_electronic_invoice_auth', type_='report')
-        
-        

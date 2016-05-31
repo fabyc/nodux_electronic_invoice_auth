@@ -7,25 +7,23 @@ import base64
 from decimal import Decimal
 from trytond.pyson import Id
 
-__all__ = ['Party', 'Address', 'Company' , 'Configuration']
-__metaclass__ = PoolMeta
-
+__all__ = ['Party', 'Address', 'Configuration']
 __metaclass__ = PoolMeta
 
 class Party():
     'Party'
     __name__ = 'party.party'
-   
+
     correo = fields.Boolean(u'Utilizar correo de la empresa?', help= "Se utilizara el correo de la empresa emisora \n para enviar comprobantes electronicos a los clientes")
     passwordws = fields.Char('Password WS', help='Ingrese el password que le fue emitido por la empresa')
     userws = fields.Char('Usuario WS', help='Ingrese el usuario que le fue emitido por la empresa')
     password = fields.Function(fields.Char('Password WS'), getter='get_password', setter='set_password')
     user = fields.Function(fields.Char('Usuario WS'), getter='get_user', setter='set_user')
     date_active = fields.Date('Fecha limite activo')
-    value_1 = fields.Numeric('Valor de 0 a 1000 comprobantes') 
-    value_2 = fields.Numeric('Valor de 1001 a 10000 comprobantes') 
-    value_3 = fields.Numeric('Valor de 10001 a 50000 comprobantes') 
-    value_4 = fields.Numeric('Mas de 50001 comprobantes') 
+    value_1 = fields.Numeric('Valor de 0 a 1000 comprobantes')
+    value_2 = fields.Numeric('Valor de 1001 a 10000 comprobantes')
+    value_3 = fields.Numeric('Valor de 10001 a 50000 comprobantes')
+    value_4 = fields.Numeric('Mas de 50001 comprobantes')
     type_document = fields.Selection([
                 ('', ''),
                 ('04', 'RUC'),
@@ -35,8 +33,8 @@ class Party():
             ], 'Type Document', states={
                 'readonly': ~Eval('active', True),
             },  depends=['active'])
-             
-    
+
+
     @classmethod
     def __setup__(cls):
         super(Party, cls).__setup__()
@@ -54,32 +52,32 @@ class Party():
         Config = pool.get('account.configuration')
         w = Config(1).value_1
         return w
-          
+
     @staticmethod
     def default_value_2():
         pool = Pool()
         Config = pool.get('account.configuration')
         w = Config(1).value_2
         return w
-    
+
     @staticmethod
     def default_value_3():
         pool = Pool()
         Config = pool.get('account.configuration')
         w = Config(1).value_3
         return w
-    
+
     @staticmethod
     def default_value_4():
         pool = Pool()
         Config = pool.get('account.configuration')
         w = Config(1).value_4
         return w
-        
-        
+
+
     def get_password(self, name):
         return 'x' * 10
-    
+
     @classmethod
     def set_password(cls, partys, name, value):
         if value == 'x' * 10:
@@ -90,11 +88,11 @@ class Party():
                         'passwordws': base64.encodestring(value),
                         }])
         cls.write(*to_write)
-        
+
 
     def get_user(self, name):
         return 'x' * 10
-    
+
     @classmethod
     def set_user(cls, partys, name, value):
         if value == 'x' * 10:
@@ -105,7 +103,7 @@ class Party():
                         'userws': base64.encodestring(value),
                         }])
         cls.write(*to_write)
-        
+
     @classmethod
     def search_rec_name(cls, name, clause):
         parties = cls.search([
@@ -142,7 +140,7 @@ class Party():
         factor = 2
         x = 0
         set_check_digit = None
-        
+
         if self.type_document == '04':
             # Si es RUC valide segun el tipo de tercero
             if int(raw_number[2]) < 6:
@@ -151,7 +149,7 @@ class Party():
                 type_party='entidad_publica'
             if int(raw_number[2]) == 9:
                 type_party='persona juridica'
-                
+
             if type_party == 'persona_natural':
                 if len(raw_number) != 13 or int(raw_number[2]) > 5 or raw_number[-3:] != '001':
                     return
@@ -172,7 +170,7 @@ class Party():
                 else:
                     value = 10 - (x % 10)
                 return (set_check_digit == str(value))
-                    
+
             elif type_party == 'entidad_publica':
                 if not len(raw_number) == 13 or raw_number[2] != '6' \
                     or raw_number[-3:] != '001':
@@ -188,7 +186,7 @@ class Party():
                 if value == 11:
                     value = 0
                 return (set_check_digit == str(value))
-                    
+
             else:
                 if len(raw_number) != 13 or \
                     (type_party in ['persona_juridica'] \
@@ -236,22 +234,9 @@ class Address:
 
 class Configuration:
     __name__ = 'party.configuration'
- 
+
     @classmethod
     def default_party_lang(cls):
         Lang = Pool().get('ir.lang')
-        langs = Lang.search([('code','=','es_EC')])   
+        langs = Lang.search([('code','=','es_EC')])
         return langs[0].id
-
-class Company:
-    __name__ = 'company.company'
-        
-    @classmethod
-    def default_currency(cls):
-        Currency = Pool().get('currency.currency')
-        usd= Currency.search([('code','=','USD')])        
-        return usd[0].id
-            
-    @staticmethod
-    def default_timezone():
-        return 'America/Guayaquil'
