@@ -60,6 +60,7 @@ SCHEMAS = {
 }
 __all__ = ['DocumentXML']
 
+
 NUEVA_RUTA = '/var/www/vhosts/nodux.ec/.noduxenvs/nodux34auth'
 
 class DocumentXML(ModelSQL, ModelView):
@@ -152,7 +153,7 @@ class DocumentXML(ModelSQL, ModelView):
         if not os.path.exists(nuevaruta):
             os.makedirs(nuevaruta)
         return nuevaruta
-        
+
     @classmethod
     def path_files(cls, ruc):
         #nuevaruta = os.getcwd() +'/comprobantes/'
@@ -300,13 +301,9 @@ class DocumentXML(ModelSQL, ModelView):
         f = open(nuevaruta_c + "/" + name_xml, 'wb')
         f.write(xml_element)
         f.close()
-        
-        commands.getoutput('rsync -az /home/noduxdev/.noduxenvs/nodux34auth/comprobantes/* /home/noduxdev/pruebas/comprobantes/')
-        #shutil.copy2(name_pdf, nuevaruta_c)
-        #shutil.copy2(name_xml, nuevaruta_c)
-        #os.remove(name_pdf)
-        #os.remove(name_xml)
 
+        commands.getoutput('rsync -az /home/noduxdev/.noduxenvs/nodux34auth/comprobantes/* /home/noduxdev/pruebas/comprobantes/')
+  
         return file_
 
     @classmethod
@@ -404,7 +401,7 @@ class DocumentXML(ModelSQL, ModelView):
             autorizacion_xml = etree.Element('autorizacion')
             etree.SubElement(autorizacion_xml, 'estado_sri').text = autorizacion.estado
             etree.SubElement(autorizacion_xml, 'numeroAutorizacion').text = autorizacion.numeroAutorizacion
-            etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION' #autorizacion.ambiente.replace("Ó","O") #Nodux autorizacion.ambiente
+            etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION' #autorizacion.ambiente.replace("Ó","O") #Nodux
             etree.SubElement(autorizacion_xml, 'comprobante').text = etree.CDATA(autorizacion.comprobante)
             autorizacion_xml = etree.tostring(autorizacion_xml, encoding = 'utf8', method = 'xml')
             messages=" ".join(messages)
@@ -481,8 +478,7 @@ class DocumentXML(ModelSQL, ModelView):
     @classmethod
     def connect_db(cls, nombre, cedula, ruc, nombre_e, tipo, fecha, empresa, numero, path_xml, path_pdf,estado, auth, email, email_e, total):
 
-        conn = psycopg2.connect(user="noduxappweb", password="ndxapwb0980", host="localhost", dbname="noduxcompelect")
-        #conn = psycopg2.connect("dbname=usuarios_web")
+        conn = psycopg2.connect(user="noduxappweb",password="ndxapwb0980", host="localhost", dbname="noduxcompelect")
         cur = conn.cursor()
         cur.execute("SELECT * FROM information_schema.sequences")
         sequences = cur.fetchall()
@@ -540,9 +536,8 @@ class SriService(object):
 
     __WS_TESTING = (__WS_TEST_RECEIV, __WS_TEST_AUTH)
     __WS_PROD = (__WS_RECEIV, __WS_AUTH)
-    __WS_ACTIVE = __WS_TESTING
+    __WS_ACTIVE = __WS_PROD
 
-        
     @classmethod
     def get_active_env(self):
         return self.get_env_prod()
