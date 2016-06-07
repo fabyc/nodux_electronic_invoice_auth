@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import commands
 import logging
 import smtplib, os
 import StringIO
@@ -59,6 +59,8 @@ SCHEMAS = {
     'lote':'schemas/lote.xsd'
 }
 __all__ = ['DocumentXML']
+
+NUEVA_RUTA = '/var/www/vhosts/nodux.ec/.noduxenvs/nodux34auth'
 
 class DocumentXML(ModelSQL, ModelView):
     "DocumentXML"
@@ -145,20 +147,20 @@ class DocumentXML(ModelSQL, ModelView):
 
     @classmethod
     def save_pk12(cls, empresa):
-        nuevaruta =os.getcwd() +'/certificados'
+        #nuevaruta =os.getcwd() +'/certificados'
+        nuevaruta = NUEVA_RUTA + '/certificados'
         if not os.path.exists(nuevaruta):
             os.makedirs(nuevaruta)
         return nuevaruta
-
+        
     @classmethod
     def path_files(cls, ruc):
-        nuevaruta =os.getcwd() +'/comprobantes/'
+        #nuevaruta = os.getcwd() +'/comprobantes/'
+        nuevaruta = NUEVA_RUTA + '/comprobantes/'
         return nuevaruta
+
     @classmethod
     def send_mail(cls, name_pdf, name, p_xml, p_pdf, from_email, to_email, n_tipo, num_fac, client, empresa_, ruc):
-        #part2 = MIMEBase('text', 'plain')
-        #part2.set_payload(invoice_xml)
-        #part2.add_header('Content-Disposition', 'attachment', filename= name)
         Company = Pool().get('company.company')
         companys = Company.search([('id', '!=', None)])
 
@@ -168,7 +170,6 @@ class DocumentXML(ModelSQL, ModelView):
         for c in companys:
             company = c
         if company:
-            print "Numero empresa ",company.party.vat_number, ruc
             servidor = company.servidor
             puerto = company.puerto
             password = company.password
@@ -288,21 +289,23 @@ class DocumentXML(ModelSQL, ModelView):
             month = '0'+ str(ahora.month)
         else:
             month = str(ahora.month)
-        nuevaruta_c =os.getcwd() +'/comprobantes/'+empresa +'/'+year+'/'+month
+        #nuevaruta_c =os.getcwd() +'/comprobantes/'+empresa +'/'+year+'/'+month
+        nuevaruta_c = NUEVA_RUTA + '/comprobantes/'+empresa +'/'+year+'/'+month
         if not os.path.exists(nuevaruta_c):
             os.makedirs(nuevaruta_c)
         file_ = 'true'
-        f = open(name_pdf, 'wb')
+        f = open(nuevaruta_c + "/" + name_pdf, 'wb')
         f.write(report)
         f.close()
-        f = open(name_xml, 'wb')
+        f = open(nuevaruta_c + "/" + name_xml, 'wb')
         f.write(xml_element)
         f.close()
-
-        shutil.copy2(name_pdf, nuevaruta_c)
-        shutil.copy2(name_xml, nuevaruta_c)
-        os.remove(name_pdf)
-        os.remove(name_xml)
+        
+        commands.getoutput('rsync -az /home/noduxdev/.noduxenvs/nodux34auth/comprobantes/* /home/noduxdev/pruebas/comprobantes/')
+        #shutil.copy2(name_pdf, nuevaruta_c)
+        #shutil.copy2(name_xml, nuevaruta_c)
+        #os.remove(name_pdf)
+        #os.remove(name_xml)
 
         return file_
 
@@ -326,7 +329,6 @@ class DocumentXML(ModelSQL, ModelView):
     def check_digital_signature(cls, file_pk12):
         #xml_str = etree.tostring(xml_document, encoding='utf8', method='xml')
         error = '0'
-        print file_pk12
         if os.path.exists(file_pk12):
             pass
         else:
@@ -388,7 +390,8 @@ class DocumentXML(ModelSQL, ModelView):
         if tipo_comprobante == 'out_debit_note':
             tipo = 'n_d'
 
-        nuevaruta =os.getcwd()+'/comprobantes/'+empresa+'/'+year+'/'+month
+        #nuevaruta =os.getcwd()+'/comprobantes/'+empresa+'/'+year+'/'+month
+        nuevaruta = NUEVA_RUTA + '/comprobantes/'+empresa+'/'+year+'/'+month
 
         if autorizacion.estado == 'AUTORIZADO':
             num = str(autorizacion.numeroAutorizacion)
@@ -401,7 +404,7 @@ class DocumentXML(ModelSQL, ModelView):
             autorizacion_xml = etree.Element('autorizacion')
             etree.SubElement(autorizacion_xml, 'estado_sri').text = autorizacion.estado
             etree.SubElement(autorizacion_xml, 'numeroAutorizacion').text = autorizacion.numeroAutorizacion
-            etree.SubElement(autorizacion_xml, 'ambiente').text = autorizacion.ambiente
+            etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION' #autorizacion.ambiente.replace("Ó","O") #Nodux autorizacion.ambiente
             etree.SubElement(autorizacion_xml, 'comprobante').text = etree.CDATA(autorizacion.comprobante)
             autorizacion_xml = etree.tostring(autorizacion_xml, encoding = 'utf8', method = 'xml')
             messages=" ".join(messages)
@@ -445,7 +448,8 @@ class DocumentXML(ModelSQL, ModelView):
         if tipo_comprobante == 'lote_out_shipment':
             tipo = 'lote_g_r_'
 
-        nuevaruta =os.getcwd()+'/comprobantes/'+empresa+'/'+year+'/'+month
+        #nuevaruta =os.getcwd()+'/comprobantes/'+empresa+'/'+year+'/'+month
+        nuevaruta = NUEVA_RUTA+'/comprobantes/'+empresa+'/'+year+'/'+month
 
         if autorizacion.estado == 'AUTORIZADO':
             num = str(autorizacion.numeroAutorizacion)
@@ -477,7 +481,8 @@ class DocumentXML(ModelSQL, ModelView):
     @classmethod
     def connect_db(cls, nombre, cedula, ruc, nombre_e, tipo, fecha, empresa, numero, path_xml, path_pdf,estado, auth, email, email_e, total):
 
-        conn = psycopg2.connect("dbname=usuarios_web")
+        conn = psycopg2.connect(user="noduxappweb", password="ndxapwb0980", host="localhost", dbname="noduxcompelect")
+        #conn = psycopg2.connect("dbname=usuarios_web")
         cur = conn.cursor()
         cur.execute("SELECT * FROM information_schema.sequences")
         sequences = cur.fetchall()
@@ -535,8 +540,9 @@ class SriService(object):
 
     __WS_TESTING = (__WS_TEST_RECEIV, __WS_TEST_AUTH)
     __WS_PROD = (__WS_RECEIV, __WS_AUTH)
-    __WS_ACTIVE = __WS_PROD
+    __WS_ACTIVE = __WS_TESTING
 
+        
     @classmethod
     def get_active_env(self):
         return self.get_env_prod()
