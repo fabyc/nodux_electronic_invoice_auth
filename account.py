@@ -405,14 +405,5 @@ class TotalVoucher(Report):
         else:
             localcontext['fin']= fiscal.end_date
             
-        """
-        address = party.cabecera+"://"+base64.decodestring(party.usuario)+":"+base64.decodestring(party.pass_db)+"@"+party.direccion+":"+party.puerto+"/"+base64.decodestring(party.name_db)
-        
-        s= xmlrpclib.ServerProxy(address)
-        
-        invoice, credit, debit, withholding, shipment = s.model.account.invoice.count_invoice(number, start_p_start, end_p_start, start_p_end, end_p_end, {})
-        
-        total_voucher = invoice + credit + debit + withholding + shipment
-        """
         return super(TotalVoucher, cls).parse(report, objects, data, 
             localcontext)

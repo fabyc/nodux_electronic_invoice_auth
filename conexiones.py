@@ -27,6 +27,7 @@ from email import encoders
 from email.Utils import COMMASPACE, formatdate
 from email import Encoders
 import os.path
+import re
 
 from lxml import etree
 from lxml.etree import DocumentInvalid
@@ -60,8 +61,8 @@ SCHEMAS = {
 }
 __all__ = ['DocumentXML']
 
-
-NUEVA_RUTA = '/var/www/vhosts/nodux.ec/.noduxenvs/nodux34auth'
+#NUEVA_RUTA = '/var/www/vhosts/nodux.ec/.noduxenvs/nodux34auth'
+NUEVA_RUTA = '/home/noduxdev/.noduxenvs/nodux34auth'
 
 class DocumentXML(ModelSQL, ModelView):
     "DocumentXML"
@@ -92,6 +93,17 @@ class DocumentXML(ModelSQL, ModelView):
         cls._error_messages.update({
                 'no_autorizado': ('Verifique su usuario y password, para acceder al sistema'),
                 })
+
+    @classmethod
+    def replace_charter(cls, cadena):
+        reemplazo = {u"Â":"A", u"Á":"A", u"À":"A", u"Ä":"A", u"É":"E", u"È":"E", u"Ê":"E",u"Ë":"E",
+            u"Í":"I",u"Ì":"I",u"Î":"I",u"Ï":"I",u"Ó":"O",u"Ò":"O",u"Ö":"O",u"Ô":"O",u"Ú":"U",u"Ù":"U",u"Ü":"U",
+            u"Û":"U",u"á":"a",u"à":"a",u"â":"a",u"ä":"a",u"é":"e",u"è":"e",u"ê":"e",u"ë":"e",u"í":"i",u"ì":"i",
+            u"ï":"i",u"î":"i",u"ó":"o",u"ò":"o",u"ô":"o",u"ö":"o",u"ú":"u",u"ù":"u",u"ü":"u",u"û":"u",u"ñ":"n",
+            u"Ñ":"N"}
+        regex = re.compile("(%s)" % "|".join(map(re.escape, reemplazo.keys())))
+        nueva_cadena = regex.sub(lambda x: str(reemplazo[x.string[x.start():x.end()]]), cadena)
+        return nueva_cadena
 
     @classmethod
     def authenticate(cls, user, password):
@@ -200,7 +212,7 @@ class DocumentXML(ModelSQL, ModelView):
                      <td>
                     <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
                      <tr>
-                    <td align="center" bgcolor="#C61F34" style="color: #ffffff; font-family: Verdana, sans-serif; font-size: 20px; padding: 40px 0 30px 0; border-radius: 5px;"><IMG SRC="ftp://nodux.ec/img/logo.png" ALT="NODUX Cía. Ltda.">
+                    <td align="center" bgcolor="#C61F34" style="color: #ffffff; font-family: Verdana, sans-serif; font-size: 20px; padding: 40px 0 30px 0; border-radius: 5px;"><IMG SRC="ftp://nodux.ec/img/logo.png" ALT="NODUX C&iacute;a. Ltda.">
                     <p>
                     Sistema Experto en Gestión Empresarial
                     </td>
@@ -290,7 +302,6 @@ class DocumentXML(ModelSQL, ModelView):
             month = '0'+ str(ahora.month)
         else:
             month = str(ahora.month)
-        #nuevaruta_c =os.getcwd() +'/comprobantes/'+empresa +'/'+year+'/'+month
         nuevaruta_c = NUEVA_RUTA + '/comprobantes/'+empresa +'/'+year+'/'+month
         if not os.path.exists(nuevaruta_c):
             os.makedirs(nuevaruta_c)
@@ -303,7 +314,7 @@ class DocumentXML(ModelSQL, ModelView):
         f.close()
 
         commands.getoutput('rsync -az /home/noduxdev/.noduxenvs/nodux34auth/comprobantes/* /home/noduxdev/pruebas/comprobantes/')
-  
+
         return file_
 
     @classmethod
@@ -324,7 +335,6 @@ class DocumentXML(ModelSQL, ModelView):
 
     @classmethod
     def check_digital_signature(cls, file_pk12):
-        #xml_str = etree.tostring(xml_document, encoding='utf8', method='xml')
         error = '0'
         if os.path.exists(file_pk12):
             pass
@@ -334,7 +344,7 @@ class DocumentXML(ModelSQL, ModelView):
 
     @classmethod
     def apply_digital_signature(cls, xml_document, file_pk12, password):
-        #xml_str = etree.tostring(xml_document, encoding='utf8', method='xml')
+        xml_document = cls.replace_charter(xml_document)
         firma_path = os.path.join(os.path.dirname(__file__), 'firma/firmaXadesBes.jar')
         p = subprocess.Popen(['java', '-jar', firma_path, xml_document, file_pk12, password], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         res = p.communicate()
@@ -351,7 +361,7 @@ class DocumentXML(ModelSQL, ModelView):
 
         client = Client(SriService.get_active_ws()[0])
         result =  client.service.validarComprobante(buffer_xml)
-        print result
+        print "result", result
 
         if result[0] == 'RECIBIDA':
             return True
@@ -359,19 +369,19 @@ class DocumentXML(ModelSQL, ModelView):
             for m in result[1][0][0][1][0]:
                 if m.identificador == '43' :
                     return True
+
                 else:
                     response = u'Comprobante Electrónico DEVUELTO:\nError : ' +str(m.mensaje) + '\nIdentificador : ' +str(m.identificador)
                     return response
 
     @classmethod
-    def request_authorization(cls, access_key, empresa, tipo_comprobante):
+    def request_authorization(cls, access_key, empresa, tipo_comprobante, documento):
         messages = []
         m = ""
         client = Client(SriService.get_active_ws()[1])
         result =  client.service.autorizacionComprobante(access_key)
-        print "El resultado ",result
         ruta_actual = os.path.join(os.path.dirname(__file__))
-        autorizacion = result.autorizaciones[0][0]
+
         ahora = datetime.datetime.now()
         year = str(ahora.year)
         if ahora.month < 10:
@@ -386,37 +396,55 @@ class DocumentXML(ModelSQL, ModelView):
             tipo = 'n_c'
         if tipo_comprobante == 'out_debit_note':
             tipo = 'n_d'
-
-        #nuevaruta =os.getcwd()+'/comprobantes/'+empresa+'/'+year+'/'+month
+        if tipo_comprobante == 'out_shipment':
+            tipo = 'g_r'
         nuevaruta = NUEVA_RUTA + '/comprobantes/'+empresa+'/'+year+'/'+month
 
-        if autorizacion.estado == 'AUTORIZADO':
-            num = str(autorizacion.numeroAutorizacion)
-            ruc = num[10:23]
-            est = num[24:27]
-            emi= num[27:30]
-            sec = num[30:39]
-            numero = ruc+'_'+est+'-'+emi+'-'+sec
-            ruta_db = os.getcwd()+'/comprobantes/'+empresa+'/'+ year+'/'+month +'/'+tipo+numero
-            autorizacion_xml = etree.Element('autorizacion')
-            etree.SubElement(autorizacion_xml, 'estado_sri').text = autorizacion.estado
-            etree.SubElement(autorizacion_xml, 'numeroAutorizacion').text = autorizacion.numeroAutorizacion
-            etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION' #autorizacion.ambiente.replace("Ó","O") #Nodux
-            etree.SubElement(autorizacion_xml, 'comprobante').text = etree.CDATA(autorizacion.comprobante)
-            autorizacion_xml = etree.tostring(autorizacion_xml, encoding = 'utf8', method = 'xml')
-            messages=" ".join(messages)
-            auth = autorizacion.estado
-            if not os.path.exists(nuevaruta):
-                os.makedirs(nuevaruta)
+        if result.autorizaciones:
+            autorizacion = result.autorizaciones[0][0]
+            if autorizacion.estado == 'AUTORIZADO':
+                num = str(autorizacion.numeroAutorizacion)
+                ruc = num[10:23]
+                est = num[24:27]
+                emi= num[27:30]
+                sec = num[30:39]
+                numero = ruc+'_'+est+'-'+emi+'-'+sec
+                ruta_db = os.getcwd()+'/comprobantes/'+empresa+'/'+ year+'/'+month +'/'+tipo+numero
+                print "fecha de autorizacion", autorizacion.fechaAutorizacion
+                autorizacion_xml = etree.Element('autorizacion')
+                etree.SubElement(autorizacion_xml, 'estado_sri').text = autorizacion.estado
+                etree.SubElement(autorizacion_xml, 'numeroAutorizacion').text = autorizacion.numeroAutorizacion
+                #etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION'
+                etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRUEBAS' #autorizacion.ambiente.replace("Ó","O") #Nodux autorizacion.ambiente
+                etree.SubElement(autorizacion_xml, 'comprobante').text = etree.CDATA(autorizacion.comprobante)
+                autorizacion_xml = etree.tostring(autorizacion_xml, encoding = 'utf8', method = 'xml')
+                messages=" ".join(messages)
+                auth = autorizacion.estado
+                if not os.path.exists(nuevaruta):
+                    os.makedirs(nuevaruta)
 
-            return autorizacion_xml, False, 'AUTORIZADO' , ruta_db, numero, num
-        else:
-            for m in autorizacion.mensajes[0]:
-                messages.append(m.identificador)
-                messages.append(m.mensaje)
-                messages=",".join(messages)
-                response = u'Comprobante Electrónico NO AUTORIZADO:\nError : ' +str(m.mensaje) + '\nIdentificador : ' +str(m.identificador)
-            return False, response, False , False, False, False
+                return autorizacion_xml, False, 'AUTORIZADO' , ruta_db, numero, num
+            else:
+                identificador = result.autorizaciones[0][0].mensajes[0][0].identificador#cls.replace_charter(str(result.autorizaciones[0][0].mensajes[0][0].identificador))
+                mensaje = result.autorizaciones[0][0].mensajes[0][0].mensaje#cls.replace_charter(str(result.autorizaciones[0][0].mensajes[0][0].mensaje))
+                informacion = result.autorizaciones[0][0].mensajes[0][0].informacionAdicional#cls.replace_charter(str(result.autorizaciones[0][0].mensajes[0][0].informacionAdicional))
+                tipo = result.autorizaciones[0][0].mensajes[0][0].tipo#cls.replace_charter(str(result.autorizaciones[0][0].mensajes[0][0].tipo))
+                mensaje = 'Tipo: '+tipo+'\nIdentificador: '+identificador +'\nMensaje: '+ mensaje +'\nInformacion Adicional: '+  informacion
+                num = str(access_key)
+                ruc = num[10:23]
+                est = num[24:27]
+                emi= num[27:30]
+                sec = num[30:39]
+                numero = ruc+'_'+est+'-'+emi+'-'+sec
+                ruta_db = os.getcwd()+'/comprobantes/'+empresa+'/'+ year+'/'+month +'/'+tipo+numero
+                autorizacion_xml = etree.Element('autorizacion')
+                etree.SubElement(autorizacion_xml, 'estado_sri').text = 'NO AUTORIZADO'
+                etree.SubElement(autorizacion_xml, 'numeroAutorizacion').text = num
+                #etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION'
+                etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRUEBAS' #autorizacion.ambiente.replace("Ó","O") #Nodux autorizacion.ambiente
+                etree.SubElement(autorizacion_xml, 'comprobante').text = etree.CDATA(documento)
+                autorizacion_xml = etree.tostring(autorizacion_xml, encoding = 'utf8', method = 'xml')
+                return mensaje, False, 'NO AUTORIZADO' , ruta_db, numero, num
 
     @classmethod
     def request_authorization_lote(cls, access_key, empresa, tipo_comprobante):
@@ -425,7 +453,6 @@ class DocumentXML(ModelSQL, ModelView):
 
         client = Client(SriService.get_active_ws()[1])
         result =  client.service.autorizacionComprobante(access_key)
-        print "El resultado ",result
         ruta_actual = os.path.join(os.path.dirname(__file__))
         autorizacion = result.autorizaciones[0][0]
         ahora = datetime.datetime.now()
@@ -445,7 +472,6 @@ class DocumentXML(ModelSQL, ModelView):
         if tipo_comprobante == 'lote_out_shipment':
             tipo = 'lote_g_r_'
 
-        #nuevaruta =os.getcwd()+'/comprobantes/'+empresa+'/'+year+'/'+month
         nuevaruta = NUEVA_RUTA+'/comprobantes/'+empresa+'/'+year+'/'+month
 
         if autorizacion.estado == 'AUTORIZADO':
@@ -477,8 +503,8 @@ class DocumentXML(ModelSQL, ModelView):
 
     @classmethod
     def connect_db(cls, nombre, cedula, ruc, nombre_e, tipo, fecha, empresa, numero, path_xml, path_pdf,estado, auth, email, email_e, total):
-
-        conn = psycopg2.connect(user="noduxappweb",password="ndxapwb0980", host="localhost", dbname="noduxcompelect")
+        #conn = psycopg2.connect(user="noduxappweb", password="ndxapwb0980", host="localhost", dbname="noduxcompelect")
+        conn = psycopg2.connect("dbname=usuarios_web")
         cur = conn.cursor()
         cur.execute("SELECT * FROM information_schema.sequences")
         sequences = cur.fetchall()
@@ -536,11 +562,13 @@ class SriService(object):
 
     __WS_TESTING = (__WS_TEST_RECEIV, __WS_TEST_AUTH)
     __WS_PROD = (__WS_RECEIV, __WS_AUTH)
-    __WS_ACTIVE = __WS_PROD
+    #__WS_ACTIVE = __WS_PROD
+    __WS_ACTIVE = __WS_TESTING
+
 
     @classmethod
     def get_active_env(self):
-        return self.get_env_prod()
+        return self.get_env_test()
 
     @classmethod
     def get_env_test(self):
