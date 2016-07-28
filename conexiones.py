@@ -95,7 +95,7 @@ class DocumentXML(ModelSQL, ModelView):
                 })
 
     @classmethod
-    def replace_charter(cls, cadena):
+    def replace_character(cls, cadena):
         reemplazo = {u"Â":"A", u"Á":"A", u"À":"A", u"Ä":"A", u"É":"E", u"È":"E", u"Ê":"E",u"Ë":"E",
             u"Í":"I",u"Ì":"I",u"Î":"I",u"Ï":"I",u"Ó":"O",u"Ò":"O",u"Ö":"O",u"Ô":"O",u"Ú":"U",u"Ù":"U",u"Ü":"U",
             u"Û":"U",u"á":"a",u"à":"a",u"â":"a",u"ä":"a",u"é":"e",u"è":"e",u"ê":"e",u"ë":"e",u"í":"i",u"ì":"i",
@@ -344,7 +344,7 @@ class DocumentXML(ModelSQL, ModelView):
 
     @classmethod
     def apply_digital_signature(cls, xml_document, file_pk12, password):
-        xml_document = cls.replace_charter(xml_document)
+        xml_document = cls.replace_character(xml_document)
         firma_path = os.path.join(os.path.dirname(__file__), 'firma/firmaXadesBes.jar')
         p = subprocess.Popen(['java', '-jar', firma_path, xml_document, file_pk12, password], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         res = p.communicate()
@@ -425,10 +425,10 @@ class DocumentXML(ModelSQL, ModelView):
 
                 return autorizacion_xml, False, 'AUTORIZADO' , ruta_db, numero, num
             else:
-                identificador = result.autorizaciones[0][0].mensajes[0][0].identificador#cls.replace_charter(str(result.autorizaciones[0][0].mensajes[0][0].identificador))
-                mensaje = result.autorizaciones[0][0].mensajes[0][0].mensaje#cls.replace_charter(str(result.autorizaciones[0][0].mensajes[0][0].mensaje))
-                informacion = result.autorizaciones[0][0].mensajes[0][0].informacionAdicional#cls.replace_charter(str(result.autorizaciones[0][0].mensajes[0][0].informacionAdicional))
-                tipo = result.autorizaciones[0][0].mensajes[0][0].tipo#cls.replace_charter(str(result.autorizaciones[0][0].mensajes[0][0].tipo))
+                identificador = result.autorizaciones[0][0].mensajes[0][0].identificador#cls.replace_character(str(result.autorizaciones[0][0].mensajes[0][0].identificador))
+                mensaje = result.autorizaciones[0][0].mensajes[0][0].mensaje#cls.replace_character(str(result.autorizaciones[0][0].mensajes[0][0].mensaje))
+                informacion = result.autorizaciones[0][0].mensajes[0][0].informacionAdicional#cls.replace_character(str(result.autorizaciones[0][0].mensajes[0][0].informacionAdicional))
+                tipo = result.autorizaciones[0][0].mensajes[0][0].tipo#cls.replace_character(str(result.autorizaciones[0][0].mensajes[0][0].tipo))
                 mensaje = 'Tipo: '+tipo+'\nIdentificador: '+identificador +'\nMensaje: '+ mensaje +'\nInformacion Adicional: '+  informacion
                 num = str(access_key)
                 ruc = num[10:23]
