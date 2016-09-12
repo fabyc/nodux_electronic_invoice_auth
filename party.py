@@ -14,7 +14,7 @@ class Party():
     'Party'
     __name__ = 'party.party'
 
-    correo = fields.Boolean(u'Utilizar correo de la empresa?', help= "Se utilizara el correo de la empresa emisora \n para enviar comprobantes electronicos a los clientes")
+    formato = fields.Boolean(u'Utilizar formato de la empresa?', help= "Se utilizara el correo de la empresa emisora \n para enviar comprobantes electronicos a los clientes")
     passwordws = fields.Char('Password WS', help='Ingrese el password que le fue emitido por la empresa')
     userws = fields.Char('Usuario WS', help='Ingrese el usuario que le fue emitido por la empresa')
     password = fields.Function(fields.Char('Password WS'), getter='get_password', setter='set_password')
@@ -33,7 +33,10 @@ class Party():
             ], 'Type Document', states={
                 'readonly': ~Eval('active', True),
             },  depends=['active'])
-
+    color = fields.Char('Color para cabecera de correo electronico', help="Ej. 0034DF")
+    nombre_logo = fields.Char('Nombre Logo', help="Debe ser igual al nombre de la imagen del Logo")
+    msm_cuerpo = fields.Text('Texto personalizado para envio de correo', help="Para tildes ingresar de la siguiente forma:\n* aacute en lugar de á\n* eacute en lugar de é\n"
+                            "* iacute en lugar de í\n* oacute en lugar de ó\n* uacute en lugar de ú\n* nacute en lugar de ñ\n")
 
     @classmethod
     def __setup__(cls):

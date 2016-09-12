@@ -28,6 +28,7 @@ from email.Utils import COMMASPACE, formatdate
 from email import Encoders
 import os.path
 import re
+import pystmark
 
 from lxml import etree
 from lxml.etree import DocumentInvalid
@@ -106,6 +107,16 @@ class DocumentXML(ModelSQL, ModelView):
         return nueva_cadena
 
     @classmethod
+    def replace_character_html(cls, cadena):
+        print "Ingresa ", cadena
+        reemplazo = {u"Á":"&Aacute;", u"É":"&Eacute;",
+            u"Í":"&Iacute;",u"Ó":"&Oacute;",u"Ú":"&Uacute;",u"á":"&aacute;",u"é":"&eacute;",
+            u"í":"&iacute;",u"ó":"&oacute;",u"ú":"&uacute;", u"ñ":"&nacute;", u"Ñ":"&Nacute;"}
+        regex = re.compile("(%s)" % "|".join(map(re.escape, reemplazo.keys())))
+        nueva_cadena = regex.sub(lambda x: str(reemplazo[x.string[x.start():x.end()]]), cadena)
+        return nueva_cadena
+
+    @classmethod
     def authenticate(cls, user, password):
         pool = Pool()
         users = pool.get('party.party')
@@ -118,7 +129,7 @@ class DocumentXML(ModelSQL, ModelView):
             flag_c = '0'
             flag_a = '0'
             for u in user:
-                c = u.correo
+                c = u.formato
                 a = u.date_active
         else:
             flag = '0'
@@ -126,6 +137,7 @@ class DocumentXML(ModelSQL, ModelView):
             flag_a = '0'
 
         if c == True:
+            #cambiar flag
             flag_c = '1'
         else:
             flag_c = '0'
@@ -174,36 +186,121 @@ class DocumentXML(ModelSQL, ModelView):
 
     @classmethod
     def send_mail(cls, name_pdf, name, p_xml, p_pdf, from_email, to_email, n_tipo, num_fac, client, empresa_, ruc):
-        Company = Pool().get('company.company')
+        pool =Pool()
+        Company = pool.get('company.company')
+        Party = pool.get('party.party')
+
         companys = Company.search([('id', '!=', None)])
+        parties = Party.search([('vat_number', '=', ruc)])
 
         correos = Pool().get('party.contact_mechanism')
         correo = correos.search([('type','=','email')])
-
         for c in companys:
             company = c
         if company:
             servidor = company.servidor
             puerto = company.puerto
-            password = company.password
+            API_KEY = company.password
 
-        for mail in correo:
-            if mail.party == company.party:
-                fromaddr = mail.value
+        for p in parties:
+            party = p
 
-        #fromaddr= from_email
-        toaddr= to_email
-        msg = MIMEMultipart()
-        msg['From'] = fromaddr
-        msg['To'] = (toaddr)
-        msg['Date'] = formatdate(localtime=True)
-        msg['Subject'] = n_tipo + ' '+num_fac
-        html = """\
+        if party.formato == True:
+            color = "#" + party.color
+            logo = party.nombre_logo
+            msm_cuerpo = party.msm_cuerpo
+
+            ruta_logo = 'http://nodux.ec:8085/static/img/empresaslogos/'+str(logo)
+            html = """\
+                    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                    <head>
+                    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+                    <title>Comprobantes Electr&oacute;nicos</title>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                    </head>
+                    <body style="margin: 0; padding: 10;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                    <td>
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+                    <tr>
+                    <td align="center" bgcolor={color} style="color: #ffffff; font-family: Verdana, sans-serif; font-size: 20px; padding: 40px 0 30px 0; border-radius: 5px;"><img src={ruta_logo} alt={empresa_}>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
+                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                         <tr>
+                        <td style="color: #153643; font-family: Arial, sans-serif; font-size: 14px;">
+                        <b> Estimado(a) {client} :</b>
+                        <p>
+                        </td>
+                         </tr>
+                         <tr>
+                        <td style="color: #153643; font-family: Arial, sans-serif; font-size: 14px; line-height: 20px;">
+                        <p>
+                        {empresa_} {msm_cuerpo}: {n_tipo} {num_fac}, el cual est&aacute; disponible para su visualizaci&oacute;n y descarga.
+                        <p>
+                          Para consultar sus comprobantes electr&oacute;nicos dir&iacute;jase a:  <a href= "http://comprobantes.nodux.ec/" style="color: #C61F34;">comprobantes.nodux.ec</a>. No olvide ingresar como usuario y contraseña  su número de identificaci&oacute;n (c&eacute;dula o RUC)
+                        </td>
+                        </tr>
+                        <tr>
+                        <td style="padding: 20px 0 10px 0; color: #153643; font-family: Arial, sans-serif; font-size: 12px; line-height: 20px;">
+                         <b>Recuerde: </b> La representaci&oacute;n impresa del comprobante electr&oacute;nico es el archivo PDF adjunto. Posee validez tributaria y podr&aacute; imprimirlo solamente en los casos que el SRI lo dispone.
+                        </td>
+                        </tr>
+                        <tr>
+                        <td bgcolor="#ffffff" style="padding: 20px 30px 0px 30px;">
+                        <center><img src="http://nodux.ec:8085/static/img/logo-email.png" alt="NODUX C&iacute;a. Ltda.">
+                        </center>
+                        </td>
+                        </tr>
+                        </table>
+                        </td>
+                        </tr>
+                         <tr>
+                         <td bgcolor={color} style="padding: 30px 30px 30px 30px; color: #153643; font-family: Arial, sans-serif; font-size:13px; line-height: 20px; border-radius: 5px">
+                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                         <tr>
+                        <td style="color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;">
+                         &reg; Nodux. C&iacute;a. Ltda. 2016<br/>
+                        </td>
+                        <td>
+                         <td align="right" width "25%" style="color: #153643; font-family: Arial, sans-serif; font-size: 13px; line-height: 20px;">
+                         <table border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                        <td style="color: #ffffff; font-family: Arial, sans-serif; font-size: 13px; line-height: 20px;">
+                         <a href="https://twitter.com/noduxEC"> Twitter
+                         </a>
+                        </td>
+                        <td style="font-size: 0; line-height: 0;" width="20">&nbsp;</td>
+                        <td>
+                         <a href="https://www.facebook.com/nodux"> Facebook
+                         </a>
+                        </td>
+                       </tr>
+                        </table>
+                       </td>
+                       </td>
+                        </tr>
+                       </table>
+                       </td>
+                        </tr>
+                       </table>
+                        </td>
+                       </tr>
+                        </table>
+                       </body>
+                       </html>
+                      """.format(ruta_logo=ruta_logo, color= color, msm_cuerpo= msm_cuerpo, client=client, empresa_=empresa_, n_tipo=n_tipo, num_fac=num_fac)
+        else:
+            html = """\
                     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
                     <html xmlns="http://www.w3.org/1999/xhtml">
                      <head>
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-                    <title>Comprobantes Electrónicos</title>
+                    <title>Comprobantes Electr&oacute;nicos</title>
                     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
                     </head>
                     <body style="margin: 0; padding: 10;">
@@ -212,9 +309,9 @@ class DocumentXML(ModelSQL, ModelView):
                      <td>
                     <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
                      <tr>
-                    <td align="center" bgcolor="#C61F34" style="color: #ffffff; font-family: Verdana, sans-serif; font-size: 20px; padding: 40px 0 30px 0; border-radius: 5px;"><IMG SRC="ftp://nodux.ec/img/logo.png" ALT="NODUX C&iacute;a. Ltda.">
+                    <td align="center" bgcolor="#C61F34" style="color: #ffffff; font-family: Verdana, sans-serif; font-size: 20px; padding: 40px 0 30px 0; border-radius: 5px;"><img src="http://nodux.ec:8085/static/img/logo-comprobantes.png" alt="NODUX C&iacute;a. Ltda.">
                     <p>
-                    Sistema Experto en Gestión Empresarial
+                    El sistema experto en gesti&oacute;n empresarial
                     </td>
                      </tr>
                      <tr>
@@ -229,14 +326,14 @@ class DocumentXML(ModelSQL, ModelView):
                      <tr>
                     <td style="color: #153643; font-family: Arial, sans-serif; font-size: 14px; line-height: 20px;">
                     <p>
-                    Nodux le informa que {empresa_} le ha emitido un comprobante electrónico: {n_tipo} {num_fac}, el cual está disponible para su visualización y descarga.
+                    Nodux le informa que {empresa_} le ha emitido un comprobante electr&oacute;nico: {n_tipo} {num_fac}, el cual est$aacute; disponible para su visualizaci&oacute;n y descarga.
                     <p>
-                      Para consultar sus comprobantes electrónicos diríjase a:  <a href= "http://nodux.ec:8085/" style="color: #C61F34;">comprobantes.nodux.ec</a>. No olvide ingresar como usuario y contraseña  su número de identificación (cedula o ruc)
+                      Para consultar sus comprobantes electr&oacute;nicos dir&iacute;jase a:  <a href= "http://comprobantes.nodux.ec/" style="color: #C61F34;">comprobantes.nodux.ec</a>. No olvide ingresar como usuario y contraseña  su n&uacute;mero de identificaci&oacute;n (c&eacute;dula o RUC)
                     </td>
                      </tr>
                      <tr>
                     <td style="padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 12px; line-height: 20px;">
-                     <b>Recuerde: </b> La representación impresa del comprobante electrónico es el archivo PDF adjunto. Posee validez tributaria y podrá imprimirlo solamente en los casos que el SRI lo dispone.
+                     <b>Recuerde: </b> La representaci&oacute;n impresa del comprobante electr&oacute;nico es el archivo PDF adjunto. Posee validez tributaria y podr&aacute; imprimirlo solamente en los casos que el SRI lo dispone.
                     </td>
                      </tr>
                     </table>
@@ -247,19 +344,19 @@ class DocumentXML(ModelSQL, ModelView):
                      <table border="0" cellpadding="0" cellspacing="0" width="100%">
                      <tr>
                     <td style="color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;">
-                     &reg; Nodux. Cía. Ltda. 2016<br/>
+                     &reg; Nodux. C&iacute;a. Ltda. 2016<br/>
                     </td>
                     <td>
                      <td align="right" width "25%" style="color: #153643; font-family: Arial, sans-serif; font-size: 13px; line-height: 20px;">
                      <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                      <td style="color: #ffffff; font-family: Arial, sans-serif; font-size: 13px; line-height: 20px;">
-                      <a href="www.twitter.com/noduxEC"> Twitter
+                      <a href="https://twitter.com/noduxEC"> Twitter
                       </a>
                      </td>
                      <td style="font-size: 0; line-height: 0;" width="20">&nbsp;</td>
                      <td>
-                      <a href="www.facebook.com/nodux/info?tab=overview"> Facebook
+                      <a href="https://www.facebook.com/nodux"> Facebook
                       </a>
                      </td>
                     </tr>
@@ -277,6 +374,38 @@ class DocumentXML(ModelSQL, ModelView):
                     </body>
                     </html>
                     """.format(client=client, empresa_=empresa_, n_tipo=n_tipo, num_fac=num_fac)
+
+        for mail in correo:
+            if mail.party == company.party:
+                SENDER = mail.value
+
+
+        toaddr= to_email
+        msg = MIMEMultipart()
+        msg['From'] = 'etqm25@gmail.com'
+        msg['To'] = 'etquizhpem@unl.edu.ec'
+        msg['Date'] = formatdate(localtime=True)
+        msg['Subject'] = n_tipo + ' '+num_fac
+
+        client = client.upper()
+        """
+        if (client == "CONSUMIDOR FINAL") | (from_email == toaddr):
+            pass
+        else:
+
+            message = pystmark.Message(sender=SENDER, to=toaddr, subject=n_tipo + ' '+num_fac,
+            html=html)
+
+            filename = p_xml
+            with open(filename) as f:
+                message.attach_binary(f.read(), filename)
+            filename = p_pdf
+            with open(filename) as f:
+                message.attach_binary(f.read(), filename)
+            pystmark.send(message, api_key=API_KEY)
+
+            pass
+        """
         pdf = MIMEApplication(open(p_pdf).read())
         pdf.add_header('Content-Disposition', 'attachment', filename=name_pdf)
         xml = MIMEApplication(open(p_xml).read())
@@ -284,12 +413,11 @@ class DocumentXML(ModelSQL, ModelView):
         msg.attach(MIMEText(html, 'html'))
         msg.attach(xml)
         msg.attach(pdf)
-        #msg.attach(part2)
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.starttls()
-        server.login(fromaddr, password)
+        server.login('etqm25@gmail.com', API_KEY)
         text = msg.as_string()
-        server.sendmail(fromaddr, toaddr, text)
+        server.sendmail('etqm25@gmail.com', 'etquizhpem@unl.edu.ec', text)
         server.quit()
 
         return True
@@ -380,8 +508,8 @@ class DocumentXML(ModelSQL, ModelView):
         m = ""
         client = Client(SriService.get_active_ws()[1])
         result =  client.service.autorizacionComprobante(access_key)
+        print "El resultado es ", result
         ruta_actual = os.path.join(os.path.dirname(__file__))
-
         ahora = datetime.datetime.now()
         year = str(ahora.year)
         if ahora.month < 10:
@@ -399,7 +527,6 @@ class DocumentXML(ModelSQL, ModelView):
         if tipo_comprobante == 'out_shipment':
             tipo = 'g_r'
         nuevaruta = NUEVA_RUTA + '/comprobantes/'+empresa+'/'+year+'/'+month
-
         if result.autorizaciones:
             autorizacion = result.autorizaciones[0][0]
             if autorizacion.estado == 'AUTORIZADO':
@@ -410,7 +537,6 @@ class DocumentXML(ModelSQL, ModelView):
                 sec = num[30:39]
                 numero = ruc+'_'+est+'-'+emi+'-'+sec
                 ruta_db = os.getcwd()+'/comprobantes/'+empresa+'/'+ year+'/'+month +'/'+tipo+numero
-                print "fecha de autorizacion", autorizacion.fechaAutorizacion
                 autorizacion_xml = etree.Element('autorizacion')
                 etree.SubElement(autorizacion_xml, 'estado_sri').text = autorizacion.estado
                 etree.SubElement(autorizacion_xml, 'numeroAutorizacion').text = autorizacion.numeroAutorizacion
