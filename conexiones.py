@@ -108,7 +108,6 @@ class DocumentXML(ModelSQL, ModelView):
 
     @classmethod
     def replace_character_html(cls, cadena):
-        print "Ingresa ", cadena
         reemplazo = {u"Á":"&Aacute;", u"É":"&Eacute;",
             u"Í":"&Iacute;",u"Ó":"&Oacute;",u"Ú":"&Uacute;",u"á":"&aacute;",u"é":"&eacute;",
             u"í":"&iacute;",u"ó":"&oacute;",u"ú":"&uacute;", u"ñ":"&nacute;", u"Ñ":"&Nacute;"}
@@ -376,7 +375,6 @@ class DocumentXML(ModelSQL, ModelView):
             if mail.party == company.party:
                 SENDER = mail.value
 
-
         client = client.upper()
 
         if (client == "CONSUMIDOR FINAL") | (from_email == to_email):
@@ -415,7 +413,8 @@ class DocumentXML(ModelSQL, ModelView):
         f.write(xml_element)
         f.close()
 
-        commands.getoutput('rsync -az /home/noduxdev/.noduxenvs/nodux34auth/comprobantes/* /home/noduxdev/pruebas/comprobantes/')
+        #commands.getoutput('rsync -az /home/noduxdev/.noduxenvs/nodux34auth/comprobantes/* /home/noduxdev/pruebas/comprobantes/')
+        commands.getoutput('rsync -az /var/www/vhosts/nodux.ec/.noduxenvs/nodux34auth/comprobantes/* /var/www/vhosts/nodux.ec/.noduxenvs/nodux34flaskwebapp/webapp/static/comprobantes')
 
         return file_
 
@@ -463,7 +462,6 @@ class DocumentXML(ModelSQL, ModelView):
 
         client = Client(SriService.get_active_ws()[0])
         result =  client.service.validarComprobante(buffer_xml)
-        print "result", result
 
         if result[0] == 'RECIBIDA':
             return True
@@ -482,7 +480,6 @@ class DocumentXML(ModelSQL, ModelView):
         m = ""
         client = Client(SriService.get_active_ws()[1])
         result =  client.service.autorizacionComprobante(access_key)
-        print "El resultado es ", result
         ruta_actual = os.path.join(os.path.dirname(__file__))
         ahora = datetime.datetime.now()
         year = str(ahora.year)
@@ -539,8 +536,8 @@ class DocumentXML(ModelSQL, ModelView):
                 autorizacion_xml = etree.Element('autorizacion')
                 etree.SubElement(autorizacion_xml, 'estado_sri').text = 'NO AUTORIZADO'
                 etree.SubElement(autorizacion_xml, 'numeroAutorizacion').text = num
-                #etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION'
-                etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRUEBAS' #autorizacion.ambiente.replace("Ó","O") #Nodux autorizacion.ambiente
+                etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION'
+                #etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRUEBAS' #autorizacion.ambiente.replace("Ó","O") #Nodux autorizacion.ambiente
                 etree.SubElement(autorizacion_xml, 'comprobante').text = etree.CDATA(documento)
                 autorizacion_xml = etree.tostring(autorizacion_xml, encoding = 'utf8', method = 'xml')
                 return mensaje, False, 'NO AUTORIZADO' , ruta_db, numero, num
@@ -602,8 +599,8 @@ class DocumentXML(ModelSQL, ModelView):
 
     @classmethod
     def connect_db(cls, nombre, cedula, ruc, nombre_e, tipo, fecha, empresa, numero, path_xml, path_pdf,estado, auth, email, email_e, total):
-        #conn = psycopg2.connect(user="noduxappweb", password="ndxapwb0980", host="localhost", dbname="noduxcompelect")
-        conn = psycopg2.connect("dbname=usuarios_web")
+        conn = psycopg2.connect(user="noduxappweb", password="ndxapwb0980", host="localhost", dbname="noduxcompelect")
+        #conn = psycopg2.connect("dbname=usuarios_web")
         cur = conn.cursor()
         cur.execute("SELECT * FROM information_schema.sequences")
         sequences = cur.fetchall()
