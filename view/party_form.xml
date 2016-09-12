@@ -8,17 +8,27 @@
             <field name="user" widget="password"/>
             <label name="password"/>
             <field name="password" widget="password"/>
-            <label name="correo"/>
-            <field name="correo"/>
+
+            <separator string="Datos personalizados para envio de correo" id='auth'/>
+            <newline/>
+            <label name="formato"/>
+            <field name="formato"/>
+            <label name="color"/>
+            <field name="color"/>
+            <label name="nombre_logo"/>
+            <field name="nombre_logo"/>
+            <newline/>
+            <label name="msm_cuerpo"/>
+            <field name="msm_cuerpo"/>
         </page>
     </xpath>
-    
+
     <xpath
         expr="/form/notebook/page[@id='accounting']/label[@name='vat_number']"
         position="before">
         <label name="type_document"/>
         <field name="type_document"/>
-        <newline/> 
+        <newline/>
     </xpath>
     <xpath
         expr="/form/notebook/page[@id='accounting']/field[@name='vat_country']"
@@ -28,7 +38,7 @@
         expr="/form/notebook/page[@id='accounting']/label[@name='vat_country']"
         position="replace">
     </xpath>
-    
+
     <xpath expr="/form/notebook/page[@id='accounting']" position="after">
         <page string="Precios Comprobantes" id="precios">
             <separator string="Precios para los comprobantes emitidos por el cliente" id='p_c'/>
@@ -43,14 +53,14 @@
             <field name="value_4"/>
         </page>
     </xpath>
-    
+
     <xpath
         expr="/form/field[@name='code']"
         position="after">
-        <newline/> 
+        <newline/>
         <label name="date_active"/>
         <field name="date_active"/>
-        
+
     </xpath>
-    
+
 </data>
