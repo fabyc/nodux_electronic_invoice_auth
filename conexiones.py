@@ -62,8 +62,8 @@ SCHEMAS = {
 }
 __all__ = ['DocumentXML']
 
-#NUEVA_RUTA = '/var/www/vhosts/nodux.ec/.noduxenvs/nodux34auth'
-NUEVA_RUTA = '/home/noduxdev/.noduxenvs/nodux34auth'
+NUEVA_RUTA = '/var/www/vhosts/nodux.ec/.noduxenvs/nodux34auth'
+#NUEVA_RUTA = '/home/noduxdev/.noduxenvs/nodux34auth'
 
 class DocumentXML(ModelSQL, ModelView):
     "DocumentXML"
@@ -137,7 +137,6 @@ class DocumentXML(ModelSQL, ModelView):
             flag_a = '0'
 
         if c == True:
-            #cambiar flag
             flag_c = '1'
         else:
             flag_c = '0'
@@ -172,7 +171,6 @@ class DocumentXML(ModelSQL, ModelView):
 
     @classmethod
     def save_pk12(cls, empresa):
-        #nuevaruta =os.getcwd() +'/certificados'
         nuevaruta = NUEVA_RUTA + '/certificados'
         if not os.path.exists(nuevaruta):
             os.makedirs(nuevaruta)
@@ -180,7 +178,6 @@ class DocumentXML(ModelSQL, ModelView):
 
     @classmethod
     def path_files(cls, ruc):
-        #nuevaruta = os.getcwd() +'/comprobantes/'
         nuevaruta = NUEVA_RUTA + '/comprobantes/'
         return nuevaruta
 
@@ -380,20 +377,12 @@ class DocumentXML(ModelSQL, ModelView):
                 SENDER = mail.value
 
 
-        toaddr= to_email
-        msg = MIMEMultipart()
-        msg['From'] = 'etqm25@gmail.com'
-        msg['To'] = 'etquizhpem@unl.edu.ec'
-        msg['Date'] = formatdate(localtime=True)
-        msg['Subject'] = n_tipo + ' '+num_fac
-
         client = client.upper()
-        """
-        if (client == "CONSUMIDOR FINAL") | (from_email == toaddr):
+
+        if (client == "CONSUMIDOR FINAL") | (from_email == to_email):
             pass
         else:
-
-            message = pystmark.Message(sender=SENDER, to=toaddr, subject=n_tipo + ' '+num_fac,
+            message = pystmark.Message(sender=SENDER, to=to_email, subject=n_tipo + ' '+num_fac,
             html=html)
 
             filename = p_xml
@@ -403,22 +392,7 @@ class DocumentXML(ModelSQL, ModelView):
             with open(filename) as f:
                 message.attach_binary(f.read(), filename)
             pystmark.send(message, api_key=API_KEY)
-
             pass
-        """
-        pdf = MIMEApplication(open(p_pdf).read())
-        pdf.add_header('Content-Disposition', 'attachment', filename=name_pdf)
-        xml = MIMEApplication(open(p_xml).read())
-        xml.add_header('Content-Disposition', 'attachment', filename=name)
-        msg.attach(MIMEText(html, 'html'))
-        msg.attach(xml)
-        msg.attach(pdf)
-        server = smtplib.SMTP('smtp.gmail.com:587')
-        server.starttls()
-        server.login('etqm25@gmail.com', API_KEY)
-        text = msg.as_string()
-        server.sendmail('etqm25@gmail.com', 'etquizhpem@unl.edu.ec', text)
-        server.quit()
 
         return True
 
@@ -540,8 +514,7 @@ class DocumentXML(ModelSQL, ModelView):
                 autorizacion_xml = etree.Element('autorizacion')
                 etree.SubElement(autorizacion_xml, 'estado_sri').text = autorizacion.estado
                 etree.SubElement(autorizacion_xml, 'numeroAutorizacion').text = autorizacion.numeroAutorizacion
-                #etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION'
-                etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRUEBAS' #autorizacion.ambiente.replace("Ó","O") #Nodux autorizacion.ambiente
+                etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION'
                 etree.SubElement(autorizacion_xml, 'comprobante').text = etree.CDATA(autorizacion.comprobante)
                 autorizacion_xml = etree.tostring(autorizacion_xml, encoding = 'utf8', method = 'xml')
                 messages=" ".join(messages)
@@ -688,8 +661,7 @@ class SriService(object):
 
     __WS_TESTING = (__WS_TEST_RECEIV, __WS_TEST_AUTH)
     __WS_PROD = (__WS_RECEIV, __WS_AUTH)
-    #__WS_ACTIVE = __WS_PROD
-    __WS_ACTIVE = __WS_TESTING
+    __WS_ACTIVE = __WS_PROD
 
 
     @classmethod
