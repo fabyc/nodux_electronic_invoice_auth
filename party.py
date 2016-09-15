@@ -14,7 +14,7 @@ class Party():
     'Party'
     __name__ = 'party.party'
 
-    formato = fields.Boolean(u'Utilizar formato de la empresa?', help= "Se utilizara el correo de la empresa emisora \n para enviar comprobantes electronicos a los clientes")
+    formato = fields.Boolean(u'Utilizar formato de la empresa?', help= "Se utilizara el formato de la empresa emisora \n para enviar comprobantes electronicos a los clientes")
     passwordws = fields.Char('Password WS', help='Ingrese el password que le fue emitido por la empresa')
     userws = fields.Char('Usuario WS', help='Ingrese el usuario que le fue emitido por la empresa')
     password = fields.Function(fields.Char('Password WS'), getter='get_password', setter='set_password')

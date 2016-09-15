@@ -471,7 +471,7 @@ class DocumentXML(ModelSQL, ModelView):
                     return True
 
                 else:
-                    response = u'Comprobante Electrónico DEVUELTO:\nError : ' +str(m.mensaje) + '\nIdentificador : ' +str(m.identificador)
+                    response = u'Comprobante Electrónico DEVUELTO:\nError : ' +str(m.mensaje) + '\nIdentificador : ' +str(m.identificador) + '\nTipo : ' +str(m.tipo)
                     return response
 
     @classmethod
