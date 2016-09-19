@@ -550,7 +550,7 @@ class DocumentXML(ModelSQL, ModelView):
         client = Client(SriService.get_active_ws()[1])
         result =  client.service.autorizacionComprobante(access_key)
         ruta_actual = os.path.join(os.path.dirname(__file__))
-        autorizacion = result.autorizaciones[0][0]
+
         ahora = datetime.datetime.now()
         year = str(ahora.year)
         if ahora.month < 10:
@@ -570,32 +570,48 @@ class DocumentXML(ModelSQL, ModelView):
 
         nuevaruta = NUEVA_RUTA+'/comprobantes/'+empresa+'/'+year+'/'+month
 
-        if autorizacion.estado == 'AUTORIZADO':
-            num = str(autorizacion.numeroAutorizacion)
-            ruc = num[10:23]
-            est = num[24:27]
-            emi= num[27:30]
-            sec = num[30:39]
-            numero = ruc+'_'+est+'-'+emi+'-'+sec
-            ruta_db = os.getcwd()+'/comprobantes/'+empresa+'/'+ year+'/'+month +'/'+tipo+numero
-            autorizacion_xml = etree.Element('autorizacion')
-            etree.SubElement(autorizacion_xml, 'estado_sri').text = autorizacion.estado
-            etree.SubElement(autorizacion_xml, 'numeroAutorizacion').text = autorizacion.numeroAutorizacion
-            etree.SubElement(autorizacion_xml, 'ambiente').text = autorizacion.ambiente
-            etree.SubElement(autorizacion_xml, 'comprobante').text = etree.CDATA(autorizacion.comprobante)
-            autorizacion_xml = etree.tostring(autorizacion_xml, encoding = 'utf8', method = 'xml')
-            messages=" ".join(messages)
-            auth = autorizacion.estado
-            if not os.path.exists(nuevaruta):
-                os.makedirs(nuevaruta)
-            return autorizacion_xml, False, 'AUTORIZADO' , ruta_db, numero, num
-        else:
-            for m in autorizacion.mensajes[0]:
-                messages.append(m.identificador)
-                messages.append(m.mensaje)
-                messages=",".join(messages)
-                response = u'Comprobante Electrónico NO AUTORIZADO:\nError : ' +str(m.mensaje) + '\nIdentificador : ' +str(m.identificador)
-            return False, response, False , False, False
+        if result.autorizaciones:
+            autorizacion = result.autorizaciones[0][0]
+            if autorizacion.estado == 'AUTORIZADO':
+                num = str(autorizacion.numeroAutorizacion)
+                ruc = num[10:23]
+                est = num[24:27]
+                emi= num[27:30]
+                sec = num[30:39]
+                numero = ruc+'_'+est+'-'+emi+'-'+sec
+                ruta_db = os.getcwd()+'/comprobantes/'+empresa+'/'+ year+'/'+month +'/'+tipo+numero
+                autorizacion_xml = etree.Element('autorizacion')
+                etree.SubElement(autorizacion_xml, 'estado_sri').text = autorizacion.estado
+                etree.SubElement(autorizacion_xml, 'numeroAutorizacion').text = autorizacion.numeroAutorizacion
+                etree.SubElement(autorizacion_xml, 'ambiente').text = autorizacion.ambiente
+                etree.SubElement(autorizacion_xml, 'comprobante').text = etree.CDATA(autorizacion.comprobante)
+                autorizacion_xml = etree.tostring(autorizacion_xml, encoding = 'utf8', method = 'xml')
+                messages=" ".join(messages)
+                auth = autorizacion.estado
+                if not os.path.exists(nuevaruta):
+                    os.makedirs(nuevaruta)
+                return autorizacion_xml, False, 'AUTORIZADO' , ruta_db, numero, num
+            else:
+
+                identificador = result.autorizaciones[0][0].mensajes[0][0].identificador
+                mensaje = result.autorizaciones[0][0].mensajes[0][0].mensaje
+                informacion = result.autorizaciones[0][0].mensajes[0][0].informacionAdicional
+                tipo = result.autorizaciones[0][0].mensajes[0][0].tipo
+                mensaje = 'Tipo: '+tipo+'\nIdentificador: '+identificador +'\nMensaje: '+ mensaje +'\nInformacion Adicional: '+  informacion
+                num = str(access_key)
+                ruc = num[10:23]
+                est = num[24:27]
+                emi= num[27:30]
+                sec = num[30:39]
+                numero = ruc+'_'+est+'-'+emi+'-'+sec
+                ruta_db = os.getcwd()+'/comprobantes/'+empresa+'/'+ year+'/'+month +'/'+tipo+numero
+                autorizacion_xml = etree.Element('autorizacion')
+                etree.SubElement(autorizacion_xml, 'estado_sri').text = 'NO AUTORIZADO'
+                etree.SubElement(autorizacion_xml, 'numeroAutorizacion').text = num
+                etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION'
+                etree.SubElement(autorizacion_xml, 'comprobante').text = etree.CDATA(documento)
+                autorizacion_xml = etree.tostring(autorizacion_xml, encoding = 'utf8', method = 'xml')
+                return mensaje, False, 'NO AUTORIZADO' , ruta_db, numero, num
 
     @classmethod
     def connect_db(cls, nombre, cedula, ruc, nombre_e, tipo, fecha, empresa, numero, path_xml, path_pdf,estado, auth, email, email_e, total):
