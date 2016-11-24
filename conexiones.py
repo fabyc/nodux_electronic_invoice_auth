@@ -542,7 +542,7 @@ class DocumentXML(ModelSQL, ModelView):
                 autorizacion_xml = etree.tostring(autorizacion_xml, encoding = 'utf8', method = 'xml')
                 return mensaje, False, 'NO AUTORIZADO' , ruta_db, numero, num
 
-@classmethod
+    @classmethod
     def request_authorization_lote(cls, access_key, empresa, tipo_comprobante):
         messages = []
         m = ""
