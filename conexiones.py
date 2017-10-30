@@ -374,9 +374,29 @@ class DocumentXML(ModelSQL, ModelView):
         for mail in correo:
             if mail.party == company.party:
                 SENDER = mail.value
+        toaddr= to_email
+        from sparkpost import SparkPost
+        sp = SparkPost('c8ec4abc976fba4f82eceae49255bb7bf76a89df')
+        response = sp.transmissions.send(
+            recipients=[toaddr],
+            html=html,
+            from_email=SENDER,
+            subject=n_tipo + ' '+num_fac,
+            attachments=[
+            {
+            	"name": name_pdf,
+            	"type": "aplication/pdf",
+            	"filename": p_pdf
+            },
+            {
+            	"name": name,
+            	"type": "text/text",
+            	"filename": p_xml
+            },
+            ]
+        )
 
-        client = client.upper()
-
+		"""
         if (client == "CONSUMIDOR FINAL") | (from_email == to_email):
             pass
         else:
@@ -391,7 +411,7 @@ class DocumentXML(ModelSQL, ModelView):
                 message.attach_binary(f.read(), filename)
             pystmark.send(message, api_key=API_KEY)
             pass
-
+		"""
         return True
 
     @classmethod
@@ -604,8 +624,7 @@ class DocumentXML(ModelSQL, ModelView):
                     autorizacion_xml = etree.Element('autorizacion')
                     etree.SubElement(autorizacion_xml, 'estado_sri').text = 'NO AUTORIZADO'
                     etree.SubElement(autorizacion_xml, 'numeroAutorizacion').text = num
-                    #etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION'
-                    etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRUEBAS' #autorizacion.ambiente.replace("Ó","O") #Nodux autorizacion.ambiente
+                    etree.SubElement(autorizacion_xml, 'ambiente').text = 'PRODUCCION'
                     autorizacion_xml = etree.tostring(autorizacion_xml, encoding = 'utf8', method = 'xml')
                     return mensaje, False, 'NO AUTORIZADO' , ruta_db, numero, num
 
