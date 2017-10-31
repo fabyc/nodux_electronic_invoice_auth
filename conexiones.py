@@ -374,6 +374,7 @@ class DocumentXML(ModelSQL, ModelView):
         for mail in correo:
             if mail.party == company.party:
                 SENDER = mail.value
+        SENDER = "comprobantes@facturaselectronicas.nodux.ec"
         toaddr= to_email
         from sparkpost import SparkPost
         sp = SparkPost('c8ec4abc976fba4f82eceae49255bb7bf76a89df')
@@ -396,7 +397,7 @@ class DocumentXML(ModelSQL, ModelView):
             ]
         )
 
-		"""
+        """
         if (client == "CONSUMIDOR FINAL") | (from_email == to_email):
             pass
         else:
@@ -411,7 +412,7 @@ class DocumentXML(ModelSQL, ModelView):
                 message.attach_binary(f.read(), filename)
             pystmark.send(message, api_key=API_KEY)
             pass
-		"""
+        """
         return True
 
     @classmethod
